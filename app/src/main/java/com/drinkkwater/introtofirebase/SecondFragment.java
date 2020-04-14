@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -126,20 +127,7 @@ public class SecondFragment extends Fragment {
             save.setClickable(false);
             final StorageReference ref = storageReference.child("files/"+ fileid);
             UploadTask uploadTask = ref.putFile(filePath);
-            Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
-                @Override
-                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
-                    if (!task.isSuccessful()) {
-                        throw task.getException();
-                    }
-
-                    // Continue with the task to get the download URL
-                    Toast.makeText(getContext(),ref.getDownloadUrl().toString(),Toast.LENGTH_LONG).show();
-                    Log.w("uploadfile",ref.getDownloadUrl().toString());
-                    return ref.getDownloadUrl();
-                }
-            });
-            messages.put("url",urlTask.toString());
+            messages.put("url",ref.getPath());
             uploadTask.addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
