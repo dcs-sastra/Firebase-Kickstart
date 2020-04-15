@@ -42,7 +42,6 @@ public class FirstFragment extends Fragment implements MessagesAdapter.OnMessage
     //Get reference to Storage
     private StorageReference storageRef = storage.getReference();
 
-    private List<MessageModel> messagesList = new ArrayList<>();
     private String typeofdata;
 
     // UI components
@@ -82,17 +81,13 @@ public class FirstFragment extends Fragment implements MessagesAdapter.OnMessage
 
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        messagesList.clear();
-    }
+
 
     /*
         Callback function when the message item is clicked.
      */
     @Override
-    public void OnMessageItemClicked(int position) {
+    public void OnMessageItemClicked(int position, List<MessageModel> messagesList ) {
         String url = messagesList.get(position).getUrl();
         if(url != null){downloadfiledata(url);}
     }
@@ -103,6 +98,7 @@ public class FirstFragment extends Fragment implements MessagesAdapter.OnMessage
      */
     private void datafromfirestore(){
 
+        final List<MessageModel> messagesList = new ArrayList<>();
         //Make the progress bar visible
         progressBar.setVisibility(View.VISIBLE);
 
@@ -132,9 +128,9 @@ public class FirstFragment extends Fragment implements MessagesAdapter.OnMessage
                 });
     }
 
-    private void downloadfile(File rootPath, StorageReference fileRef, String typeofdata){
+    private void downloadfile(File rootPath, StorageReference fileRef, String typeofdata) {
 
-        if(typeofdata != null){
+        if (typeofdata != null) {
 
             //file is created with the type specified
             final File localFile = new File(rootPath, fileRef.getName() + "." + typeofdata);
@@ -150,13 +146,13 @@ public class FirstFragment extends Fragment implements MessagesAdapter.OnMessage
                     }
                 })
                         .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        // Handle any errors
-                        progressBar.setVisibility(View.GONE);
-                        Toast.makeText(getContext(), "download task failed", Toast.LENGTH_LONG).show();
-                    }
-                });
+                            @Override
+                            public void onFailure(@NonNull Exception exception) {
+                                // Handle any errors
+                                progressBar.setVisibility(View.GONE);
+                                Toast.makeText(getContext(), "download task failed", Toast.LENGTH_LONG).show();
+                            }
+                        });
             } catch (Exception e) {
                 Log.w("exception", e);
             }
@@ -193,4 +189,5 @@ public class FirstFragment extends Fragment implements MessagesAdapter.OnMessage
             }
         });
     }
+
 }

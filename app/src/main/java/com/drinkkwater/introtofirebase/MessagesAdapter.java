@@ -81,10 +81,10 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
 
         @Override
         public void onClick(View v) {
-            onMessageClicklistner.OnMessageItemClicked(getAdapterPosition());
+            onMessageClicklistner.OnMessageItemClicked(getAdapterPosition(), messages);
         }
     }
     public interface OnMessageClicklistner{
-         void OnMessageItemClicked(int position) ;
+         void OnMessageItemClicked(int position, List<MessageModel> messageModelList) ;
     }
 }
