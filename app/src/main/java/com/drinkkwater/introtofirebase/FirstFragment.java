@@ -19,6 +19,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -44,17 +45,16 @@ public class FirstFragment extends Fragment implements MessagesAdapter.OnMessage
     StorageReference storageRef = storage.getReference();
 
     List<Messages> messages = new ArrayList<>();
+    String typeofdata;
+
+    // UI components
     RecyclerView messagesRecyclerView ;
     CatLoadingView catLoadingView;
-    String typeofdata;
     Dialog loading ;
-
+    ExtendedFloatingActionButton floatingActionButton;
 
     @Override
-    public View onCreateView(
-            LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState
-    ) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_first, container, false);
     }
 
@@ -78,7 +78,8 @@ public class FirstFragment extends Fragment implements MessagesAdapter.OnMessage
 
         //To get data from firestore
         datafromfirestore();
-        view.findViewById(R.id.button_first).setOnClickListener(new View.OnClickListener() {
+        floatingActionButton = view.findViewById(R.id.eFab);
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 NavHostFragment.findNavController(FirstFragment.this)

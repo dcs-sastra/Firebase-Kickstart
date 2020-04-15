@@ -1,50 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    tools:context=".SecondFragment"
-    android:orientation="vertical">
+    android:layout_height="match_parent"
+    android:padding="@dimen/margin_16dp"
+    tools:context=".SecondFragment">
 
-    <TextView
-        android:id="@+id/textview_second"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-    <TextView
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/filledTextFieldMessage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Message:"
-        android:padding="8dp"/>
-    <EditText
+        android:hint="Message"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/message_et"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/filledTextFieldAuthor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/message_et"
-        android:padding="8dp"/>
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Author:"/>
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/author_et"
-        android:padding="8dp"
-        android:layout_marginBottom="16dp"/>
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:hint="Author"
+        android:layout_marginStart="@dimen/margin_8dp"
+        android:layout_marginEnd="@dimen/margin_8dp"
+        android:layout_marginTop="@dimen/margin_16dp"
+        app:layout_constraintEnd_toEndOf="@id/filledTextFieldMessage"
+        app:layout_constraintStart_toStartOf="@id/filledTextFieldMessage"
+        app:layout_constraintTop_toBottomOf="@id/filledTextFieldMessage">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/author_et"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/addfiles"
-        android:textColor="@color/design_default_color_surface"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_16dp"
+        android:layout_marginEnd="@dimen/margin_16dp"
+        android:layout_marginBottom="@dimen/margin_16dp"
+        android:layout_marginTop="@dimen/margin_16dp"
         android:background="@color/colorPrimary"
         android:text="Add file here"
-        android:layout_marginBottom="16dp"/>
-    <Button
+        android:textColor="@color/design_default_color_surface"
+        app:layout_constraintEnd_toEndOf="@id/filledTextFieldMessage"
+        app:layout_constraintStart_toStartOf="@id/filledTextFieldMessage"
+        app:layout_constraintTop_toBottomOf="@id/filledTextFieldAuthor" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_save"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/save"
-        android:id="@+id/button_save"
-        android:textColor="@color/design_default_color_surface"
         android:background="@color/colorPrimary"
-        android:gravity="center"/>
-</LinearLayout>
+        android:text="@string/save"
+        android:textColor="@color/design_default_color_surface"
+        android:layout_marginStart="@dimen/margin_16dp"
+        android:layout_marginEnd="@dimen/margin_16dp"
+        android:layout_marginBottom="@dimen/margin_16dp"
+        app:layout_constraintEnd_toEndOf="@id/addfiles"
+        app:layout_constraintStart_toStartOf="@id/addfiles"
+        app:layout_constraintTop_toBottomOf="@id/addfiles" />
+</androidx.constraintlayout.widget.ConstraintLayout>

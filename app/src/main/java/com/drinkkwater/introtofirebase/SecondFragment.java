@@ -24,6 +24,8 @@ import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
@@ -42,16 +44,19 @@ import dmax.dialog.SpotsDialog;
 
 public class SecondFragment extends Fragment {
 
+    // References to Firebase
     FirebaseFirestore dataBase  = FirebaseFirestore.getInstance();
     FirebaseStorage storage = FirebaseStorage.getInstance();
     StorageReference storageReference = storage.getReference();
 
     Map<String,Object> messages = new HashMap<>();
-    EditText message_et,author_et;
-    CatLoadingView catLoadingView;
     int CHOOSE_FILE = 71;
     Uri filePath;
-    Button save;
+
+    // UI Components
+    TextInputEditText message_et,author_et;
+    CatLoadingView catLoadingView;
+    MaterialButton save;
     Dialog loading ;
 
     @Override
@@ -122,7 +127,7 @@ public class SecondFragment extends Fragment {
     }
     private void selectfile(){
         Intent fileIntent = new Intent();
-        fileIntent.setType( "*/ *");
+        fileIntent.setType( "*/*");
         fileIntent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(fileIntent,"Choose file to upload"),CHOOSE_FILE);
     }
