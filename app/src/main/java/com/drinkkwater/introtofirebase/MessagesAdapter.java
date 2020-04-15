@@ -1,20 +1,27 @@
 package com.drinkkwater.introtofirebase;
 
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
+
 import java.util.List;
 
 public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.MessagesViewHolder> {
-    private List<Messages> messages;
-    OnMessageClicklistner onMessageClicklistner;
 
-    public MessagesAdapter(List<Messages> messages,OnMessageClicklistner onMessageClicklistner) {
+    private List<MessageModel> messages;
+    private OnMessageClicklistner onMessageClicklistner;
+    private Context context;
+
+    public MessagesAdapter(List<MessageModel> messages, OnMessageClicklistner onMessageClicklistner) {
         this.messages = messages;
         this.onMessageClicklistner = onMessageClicklistner;
     }
@@ -24,6 +31,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
     public MessagesAdapter.MessagesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.messages_list_item,parent,false);
+        context = view.getContext();
         return new MessagesViewHolder(view,onMessageClicklistner);
     }
 
@@ -33,8 +41,14 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
         holder.messagesTextView.setText(messages.get(position).getMessage());
         if(messages.get(position).getUrl() == null){
             holder.urlTextView.setText("No attatchment available");
+            holder.imageViewPicture.setVisibility(View.GONE);
         }
         else {
+            holder.imageViewPicture.setVisibility(View.VISIBLE);
+            Glide.with(context)
+                    .load(messages.get(position).getUrl())
+                    .into(holder.imageViewPicture);
+
             holder.urlTextView.setText("Attatchment available click to download");
         }
     }
@@ -50,6 +64,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
         TextView messagesTextView;
         TextView authorTextView;
         TextView urlTextView;
+        ImageView imageViewPicture;
+
         OnMessageClicklistner onMessageClicklistner;
 
         public MessagesViewHolder(@NonNull View itemView,OnMessageClicklistner onMessageClicklistner) {
@@ -57,6 +73,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
             messagesTextView = itemView.findViewById(R.id.messages);
             authorTextView = itemView.findViewById(R.id.author);
             urlTextView = itemView.findViewById(R.id.url);
+            imageViewPicture = itemView.findViewById(R.id.ivPicture);
             this.onMessageClicklistner = onMessageClicklistner;
             itemView.setOnClickListener(this);
         }
@@ -64,10 +81,10 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
 
         @Override
         public void onClick(View v) {
-            onMessageClicklistner.OnClick(getAdapterPosition());
+            onMessageClicklistner.OnMessageItemClicked(getAdapterPosition());
         }
     }
     public interface OnMessageClicklistner{
-         void OnClick(int position) ;
+         void OnMessageItemClicked(int position) ;
     }
 }

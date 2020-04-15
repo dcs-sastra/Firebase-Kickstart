@@ -35,21 +35,24 @@ import java.util.List;
 
 public class FirstFragment extends Fragment implements MessagesAdapter.OnMessageClicklistner {
 
-    //create an Instance of Firebase firestore
-    FirebaseFirestore database = FirebaseFirestore.getInstance();
-    //create an Instance of Firebase storage
-    FirebaseStorage storage  = FirebaseStorage.getInstance();
-    //get reference to Storage
-    StorageReference storageRef = storage.getReference();
+    //Create an Instance of Firebase Firestore
+    private FirebaseFirestore database = FirebaseFirestore.getInstance();
+    //Create an Instance of Firebase Storage
+    private FirebaseStorage storage  = FirebaseStorage.getInstance();
+    //Get reference to Storage
+    private StorageReference storageRef = storage.getReference();
 
-    List<Messages> messages = new ArrayList<>();
-    String typeofdata;
+    private List<MessageModel> messagesList = new ArrayList<>();
+    private String typeofdata;
 
     // UI components
-    RecyclerView messagesRecyclerView ;
-    ExtendedFloatingActionButton floatingActionButton;
-    ProgressBar progressBar;
+    private RecyclerView messagesRecyclerView ;
+    private ExtendedFloatingActionButton floatingActionButton;
+    private ProgressBar progressBar;
 
+    /*
+        This method inflates the fragment on the view
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_first, container, false);
@@ -58,45 +61,108 @@ public class FirstFragment extends Fragment implements MessagesAdapter.OnMessage
 
     public void onViewCreated(@NonNull final View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        //Initialization of UI components
         messagesRecyclerView = view.findViewById(R.id.messages_recyclerview);
         progressBar = view.findViewById(R.id.progressbar);
-        //To get data from firestore
-        datafromfirestore();
         floatingActionButton = view.findViewById(R.id.eFab);
+
+        //Setting up onClickListener for the ExtendedFloatingActionButton (Add action)
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //Navigate to the SecondFagment
                 NavHostFragment.findNavController(FirstFragment.this)
                         .navigate(R.id.action_FirstFragment_to_SecondFragment);
             }
         });
 
+        //To get data from Firestore
+        datafromfirestore();
+
     }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        messagesList.clear();
+    }
+
+    /*
+        Callback function when the message item is clicked.
+     */
+    @Override
+    public void OnMessageItemClicked(int position) {
+        String url = messagesList.get(position).getUrl();
+        if(url != null){downloadfiledata(url);}
+    }
+
+
+    /*
+        HELPER FUNCTIONS
+     */
     private void datafromfirestore(){
+
+        //Make the progress bar visible
         progressBar.setVisibility(View.VISIBLE);
+
         database.collection("messages")                                //refers to the "messages" collection in the database
                 .get()                                                              //gets all  the data
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {    //called when the data is received
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        progressBar.setVisibility(View.GONE);
+
+                        //Make the progress bar invisible
+                        progressBar.setVisibility(View.INVISIBLE);
+
                         if(task.isSuccessful()){
-                            for (QueryDocumentSnapshot document : task.getResult()) {  //documents in the collection are converted to objects of Messages class
-                                Messages message = document.toObject(Messages.class);  //Messages class contains same parameters as documents
-                                messages.add(message);
+                            /*
+                                Documents in the collection are converted to objects of Messages class
+                                Messages class contains same parameters as documents
+                             */
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                MessageModel message = document.toObject(MessageModel.class);
+                                messagesList.add(message);
                             }
+                            //Set the RecyclerView and set its adapter
                             messagesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-                            messagesRecyclerView.setAdapter(new MessagesAdapter(messages, FirstFragment.this));
+                            messagesRecyclerView.setAdapter(new MessagesAdapter(messagesList, FirstFragment.this));
                         }
                     }
                 });
     }
 
-    @Override
-    public void OnClick(int position) {
-        String url = messages.get(position).getUrl();
-        if(url != null){downloadfiledata(url);}
+    private void downloadfile(File rootPath, StorageReference fileRef, String typeofdata){
+
+        if(typeofdata != null){
+
+            //file is created with the type specified
+            final File localFile = new File(rootPath, fileRef.getName() + "." + typeofdata);
+            try {
+                progressBar.setVisibility(View.VISIBLE);
+                //getFile method downloads the data
+                fileRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                        //file has been created
+                        progressBar.setVisibility(View.GONE);
+                        Toast.makeText(getContext(), "Your file is saved in " + localFile.toString(), Toast.LENGTH_LONG).show();
+                    }
+                })
+                        .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle any errors
+                        progressBar.setVisibility(View.GONE);
+                        Toast.makeText(getContext(), "download task failed", Toast.LENGTH_LONG).show();
+                    }
+                });
+            } catch (Exception e) {
+                Log.w("exception", e);
+            }
+        }
     }
+
     public void downloadfiledata(String url) {
         progressBar.setVisibility(View.VISIBLE);
         //url contains the path to file in the database
@@ -126,41 +192,5 @@ public class FirstFragment extends Fragment implements MessagesAdapter.OnMessage
                 // Uh-oh, an error occurred!
             }
         });
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        messages.clear();
-    }
-
-    private void downloadfile(File rootPath, StorageReference fileRef, String typeofdata){
-        if(typeofdata != null){
-
-            //file is created with the type specified
-            final File localFile = new File(rootPath, fileRef.getName() + "." + typeofdata);
-            try {
-                progressBar.setVisibility(View.VISIBLE);
-                //getFile method downloads the data
-                fileRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                        //file has been created
-                        progressBar.setVisibility(View.GONE);
-                        Toast.makeText(getContext(), "Your file is saved in " + localFile.toString(), Toast.LENGTH_LONG).show();
-                    }
-                })
-                        .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        // Handle any errors
-                        progressBar.setVisibility(View.GONE);
-                        Toast.makeText(getContext(), "download task failed", Toast.LENGTH_LONG).show();
-                    }
-                });
-            } catch (Exception e) {
-                Log.w("exception", e);
-            }
-        }
     }
 }
