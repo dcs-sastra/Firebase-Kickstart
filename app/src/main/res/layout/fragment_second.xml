@@ -47,4 +47,10 @@
         android:textColor="@color/design_default_color_surface"
         android:background="@color/colorPrimary"
         android:gravity="center"/>
+    <ProgressBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressbar"
+        android:visibility="gone"
+        android:progressBackgroundTint="@color/cardview_shadow_start_color"/>
 </LinearLayout>

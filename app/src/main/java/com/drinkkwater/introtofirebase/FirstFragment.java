@@ -1,12 +1,12 @@
 package com.drinkkwater.introtofirebase;
 
-import android.app.Dialog;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -26,13 +26,11 @@ import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
-import com.roger.catloadinglibrary.CatLoadingView;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import dmax.dialog.SpotsDialog;
 
 public class FirstFragment extends Fragment implements MessagesAdapter.OnMessageClicklistner {
 
@@ -45,9 +43,8 @@ public class FirstFragment extends Fragment implements MessagesAdapter.OnMessage
 
     List<Messages> messages = new ArrayList<>();
     RecyclerView messagesRecyclerView ;
-    CatLoadingView catLoadingView;
     String typeofdata;
-    Dialog loading ;
+    ProgressBar progressBar;
 
 
     @Override
@@ -61,21 +58,8 @@ public class FirstFragment extends Fragment implements MessagesAdapter.OnMessage
 
     public void onViewCreated(@NonNull final View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-
-        loading = new SpotsDialog.Builder()
-                .setContext(getContext())
-                .setCancelable(false)
-                .setMessage("Downloading....").build();
-        catLoadingView = new CatLoadingView();
-        catLoadingView.setCanceledOnTouchOutside(false);
-        catLoadingView.show(getChildFragmentManager(),"Loading");
-        catLoadingView.setText(".....");
-
-
         messagesRecyclerView = view.findViewById(R.id.messages_recyclerview);
-
-
+        progressBar = view.findViewById(R.id.progressbar);
         //To get data from firestore
         datafromfirestore();
         view.findViewById(R.id.button_first).setOnClickListener(new View.OnClickListener() {
@@ -88,13 +72,14 @@ public class FirstFragment extends Fragment implements MessagesAdapter.OnMessage
 
     }
     private void datafromfirestore(){
+        progressBar.setVisibility(View.VISIBLE);
         database.collection("messages")                                //refers to the "messages" collection in the database
                 .get()                                                              //gets all  the data
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {    //called when the data is received
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        progressBar.setVisibility(View.GONE);
                         if(task.isSuccessful()){
-                            catLoadingView.dismiss();
                             for (QueryDocumentSnapshot document : task.getResult()) {  //documents in the collection are converted to objects of Messages class
                                 Messages message = document.toObject(Messages.class);  //Messages class contains same parameters as documents
                                 messages.add(message);
@@ -112,6 +97,7 @@ public class FirstFragment extends Fragment implements MessagesAdapter.OnMessage
         if(url != null){downloadfiledata(url);}
     }
     public void downloadfiledata(String url) {
+        progressBar.setVisibility(View.VISIBLE);
         //url contains the path to file in the database
         //fileRef refers to a specific file
         final StorageReference fileRef = storageRef.child(url);
@@ -139,7 +125,6 @@ public class FirstFragment extends Fragment implements MessagesAdapter.OnMessage
                 // Uh-oh, an error occurred!
             }
         });
-
     }
 
     @Override
@@ -154,13 +139,13 @@ public class FirstFragment extends Fragment implements MessagesAdapter.OnMessage
             //file is created with the type specified
             final File localFile = new File(rootPath, fileRef.getName() + "." + typeofdata);
             try {
-                loading.show();
+                progressBar.setVisibility(View.VISIBLE);
                 //getFile method downloads the data
                 fileRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
                         //file has been created
-                        loading.dismiss();
+                        progressBar.setVisibility(View.GONE);
                         Toast.makeText(getContext(), "Your file is saved in " + localFile.toString(), Toast.LENGTH_LONG).show();
                     }
                 })
@@ -168,7 +153,7 @@ public class FirstFragment extends Fragment implements MessagesAdapter.OnMessage
                     @Override
                     public void onFailure(@NonNull Exception exception) {
                         // Handle any errors
-                        loading.dismiss();
+                        progressBar.setVisibility(View.GONE);
                         Toast.makeText(getContext(), "download task failed", Toast.LENGTH_LONG).show();
                     }
                 });

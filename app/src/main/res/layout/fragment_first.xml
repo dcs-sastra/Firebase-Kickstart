@@ -16,6 +16,10 @@
         android:background="@color/colorPrimary"
         android:textColor="@color/design_default_color_surface"
         android:text="@string/next" />
+    <ProgressBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressbar"/>
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
