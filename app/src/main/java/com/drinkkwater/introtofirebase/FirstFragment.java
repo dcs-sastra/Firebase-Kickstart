@@ -42,7 +42,6 @@ public class FirstFragment extends Fragment implements MessagesAdapter.OnMessage
     //get reference to Storage
     StorageReference storageRef = storage.getReference();
 
-    List<Messages> messages = new ArrayList<>();
     String typeofdata;
 
     // UI components
@@ -73,6 +72,7 @@ public class FirstFragment extends Fragment implements MessagesAdapter.OnMessage
 
     }
     private void datafromfirestore(){
+        final List<Messages> messages = new ArrayList<>();
         progressBar.setVisibility(View.VISIBLE);
         database.collection("messages")                                //refers to the "messages" collection in the database
                 .get()                                                              //gets all  the data
@@ -93,7 +93,7 @@ public class FirstFragment extends Fragment implements MessagesAdapter.OnMessage
     }
 
     @Override
-    public void OnClick(int position) {
+    public void OnClick(int position,List<Messages> messages ) {
         String url = messages.get(position).getUrl();
         if(url != null){downloadfiledata(url);}
     }
@@ -126,12 +126,6 @@ public class FirstFragment extends Fragment implements MessagesAdapter.OnMessage
                 // Uh-oh, an error occurred!
             }
         });
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        messages.clear();
     }
 
     private void downloadfile(File rootPath, StorageReference fileRef, String typeofdata){

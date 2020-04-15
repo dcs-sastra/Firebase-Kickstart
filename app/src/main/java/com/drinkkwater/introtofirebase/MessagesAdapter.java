@@ -64,10 +64,10 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
 
         @Override
         public void onClick(View v) {
-            onMessageClicklistner.OnClick(getAdapterPosition());
+            onMessageClicklistner.OnClick(getAdapterPosition(),messages);
         }
     }
     public interface OnMessageClicklistner{
-         void OnClick(int position) ;
+         void OnClick(int position,List<Messages> messages ) ;
     }
 }
