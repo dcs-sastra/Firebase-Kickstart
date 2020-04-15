@@ -1,5 +1,6 @@
 package com.drinkkwater.introtofirebase;
 
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -36,18 +37,22 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import dmax.dialog.SpotsDialog;
+
 
 public class SecondFragment extends Fragment {
 
-    private FirebaseFirestore dataBase  = FirebaseFirestore.getInstance();
+    FirebaseFirestore dataBase  = FirebaseFirestore.getInstance();
+    FirebaseStorage storage = FirebaseStorage.getInstance();
+    StorageReference storageReference = storage.getReference();
+
     Map<String,Object> messages = new HashMap<>();
     EditText message_et,author_et;
     CatLoadingView catLoadingView;
-    FirebaseStorage storage = FirebaseStorage.getInstance();
-    StorageReference storageReference = storage.getReference();
     int CHOOSE_FILE = 71;
     Uri filePath;
     Button save;
+    Dialog loading ;
 
     @Override
     public View onCreateView(
@@ -60,7 +65,14 @@ public class SecondFragment extends Fragment {
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        loading = new SpotsDialog.Builder()
+                .setContext(getContext())
+                .setCancelable(false)
+                .setMessage("Uploading....").build();
         messages.put("url",null);
+
+        //to add attachments
         Button extras = view.findViewById(R.id.addfiles);
         extras.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,11 +80,14 @@ public class SecondFragment extends Fragment {
                 selectfile();
             }
         });
+
         catLoadingView = new CatLoadingView();
         catLoadingView.setCanceledOnTouchOutside(false);
         catLoadingView.setText(".....");
+
         message_et = view.findViewById(R.id.message_et);
         author_et = view.findViewById(R.id.author_et);
+
         save = view.findViewById(R.id.button_save);
         save.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -87,7 +102,7 @@ public class SecondFragment extends Fragment {
     }
     private void senddatatofirestore(Map<String,Object> messages){
         dataBase.collection("messages")
-                .add(messages)
+                .add(messages)      //add method uploads data to firestore
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
@@ -123,29 +138,25 @@ public class SecondFragment extends Fragment {
     }
     private void uploadfile(){
         if(filePath != null)
-        { String fileid = UUID.randomUUID().toString();
+        { String fileid = UUID.randomUUID().toString(); //random id for file name
+            loading.show();
             save.setClickable(false);
-            final StorageReference ref = storageReference.child("files/"+ fileid);
-            UploadTask uploadTask = ref.putFile(filePath);
-            messages.put("url",ref.getPath());
+            final StorageReference ref = storageReference.child("files/"+ fileid);   //refers to a specific path here "files/name_of_the_file"
+            UploadTask uploadTask = ref.putFile(filePath); //putFile method uploads file to storage
+            messages.put("url",ref.getPath());      //path of the file is stored to firestore to download the file later
             uploadTask.addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
+                            loading.dismiss();
                             Toast.makeText(getContext(), "Failed "+e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                     save.setClickable(true);
+                    loading.dismiss();
                 }
-            })
-                    .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-                            double progress = (100.0*taskSnapshot.getBytesTransferred()/taskSnapshot
-                                    .getTotalByteCount());
-                        }
-                    });
+            });
         }
     }
 }

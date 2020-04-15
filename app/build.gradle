@@ -40,4 +40,5 @@ dependencies {
     implementation "androidx.cardview:cardview:1.0.0"
     implementation 'com.roger.catloadinglibrary:catloadinglibrary:1.0.4'
     implementation 'com.google.firebase:firebase-storage:19.1.1'
+    implementation 'com.github.d-max:spots-dialog:1.1@aar'
 }

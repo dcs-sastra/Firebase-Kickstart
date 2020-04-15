@@ -29,16 +29,22 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/author_et"
-        android:padding="8dp"/>
+        android:padding="8dp"
+        android:layout_marginBottom="16dp"/>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/addfiles"
+        android:textColor="@color/design_default_color_surface"
+        android:background="@color/colorPrimary"
+        android:text="Add file here"
+        android:layout_marginBottom="16dp"/>
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/save"
         android:id="@+id/button_save"
+        android:textColor="@color/design_default_color_surface"
+        android:background="@color/colorPrimary"
         android:gravity="center"/>
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/addfiles"
-        android:text="Add file here"/>
 </LinearLayout>
