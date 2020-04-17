@@ -1,4 +1,4 @@
-package com.drinkkwater.introtofirebase;
+package com.drinkkwater.introtofirebase.fragments;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -16,6 +16,8 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
 
+import com.drinkkwater.introtofirebase.MessageModel;
+import com.drinkkwater.introtofirebase.R;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -30,7 +32,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import java.util.Map;
 import java.util.UUID;
 
 
@@ -93,6 +94,7 @@ public class SecondFragment extends Fragment {
             }
         });
 
+
     }
 
     @Override
@@ -145,60 +147,61 @@ public class SecondFragment extends Fragment {
 
     private void uploadfile(String fileName){
 
-        if(filePath != null) {
+            if(filePath != null) {
 
-            progressBar.setVisibility(View.VISIBLE);
-            String fileid = fileName + "_" + UUID.randomUUID().toString(); //random id for file name
-            save.setVisibility(View.GONE);
+                progressBar.setVisibility(View.VISIBLE);
+                String fileid = fileName + "_" + UUID.randomUUID().toString(); //random id for file name
+                save.setVisibility(View.GONE);
 
-            final StorageReference ref = storageReference.child("files/"+ fileid);   //refers to a specific path here "files/name_of_the_file"
-            UploadTask uploadTask = ref.putFile(filePath); //putFile method uploads file to storage
+                final StorageReference ref = storageReference.child("files/"+ fileid);   //refers to a specific path here "files/name_of_the_file"
+                UploadTask uploadTask = ref.putFile(filePath); //putFile method uploads file to storage
 
-            Task<Uri> uriTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
-                @Override
-                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
-                    if (!task.isSuccessful()) {
-                        throw task.getException();
+                Task<Uri> uriTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                    @Override
+                    public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                        if (!task.isSuccessful()) {
+                            throw task.getException();
+                        }
+
+                        Log.d("fff", ref.getDownloadUrl().toString());
+
+                        return ref.getDownloadUrl();
                     }
+                }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Uri> task) {
+                        if (task.isSuccessful()){
+                            Uri downloadUri = task.getResult();
 
-                    Log.d("fff", ref.getDownloadUrl().toString());
+                            Log.d("fff", downloadUri.toString());
 
-                    return ref.getDownloadUrl();
-                }
-            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
-                @Override
-                public void onComplete(@NonNull Task<Uri> task) {
-                    if (task.isSuccessful()){
-                        Uri downloadUri = task.getResult();
-
-                        Log.d("fff", downloadUri.toString());
-
-                        messageModel.setUrl(downloadUri.toString());      //path of the file is stored to firestore to download the file later
+                            messageModel.setUrl(downloadUri.toString());      //path of the file is stored to firestore to download the file later
+                            save.setVisibility(View.VISIBLE);
+                            progressBar.setVisibility(View.GONE);
+                            Toast.makeText(getContext(),"File Uploaded",Toast.LENGTH_SHORT).show();
+                        }else {
+                            Toast.makeText(getContext(),"Upload Failed",Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+                uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                         save.setVisibility(View.VISIBLE);
                         progressBar.setVisibility(View.GONE);
                         Toast.makeText(getContext(),"File Uploaded",Toast.LENGTH_SHORT).show();
-                    }else {
-                        Toast.makeText(getContext(),"Upload Failed",Toast.LENGTH_SHORT).show();
                     }
-                }
-            });
-            uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    save.setVisibility(View.VISIBLE);
-                    progressBar.setVisibility(View.GONE);
-                    Toast.makeText(getContext(),"File Uploaded",Toast.LENGTH_SHORT).show();
-                }
-            });
+                });
 
-            uploadTask.addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            save.setVisibility(View.VISIBLE);
-                            progressBar.setVisibility(View.GONE);
-                            Toast.makeText(getContext(),"Upload Failed",Toast.LENGTH_SHORT).show();
-                        }
-            });
+                uploadTask.addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                save.setVisibility(View.VISIBLE);
+                                progressBar.setVisibility(View.GONE);
+                                Toast.makeText(getContext(),"Upload Failed",Toast.LENGTH_SHORT).show();
+                            }
+                });
+            }
         }
-    }
+
 }
