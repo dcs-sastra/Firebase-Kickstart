@@ -1,4 +1,4 @@
-package com.drinkkwater.introtofirebase;
+package com.drinkkwater.introtofirebase.fragments;
 
 import android.os.Bundle;
 import android.os.Environment;
@@ -15,6 +15,9 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.drinkkwater.introtofirebase.MessageModel;
+import com.drinkkwater.introtofirebase.MessagesAdapter;
+import com.drinkkwater.introtofirebase.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;

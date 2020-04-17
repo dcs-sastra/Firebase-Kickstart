@@ -10,4 +10,8 @@
 
     <string name="extended_fab_label">Add</string>
     <string name="extended_fab_content_desc">Add Values</string>
+    <string name="title_activity_sigin_in">SiginInActivity</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
 </resources>
