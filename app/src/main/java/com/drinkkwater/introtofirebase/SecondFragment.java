@@ -23,6 +23,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
@@ -73,6 +75,11 @@ public class SecondFragment extends Fragment {
         btnAddFiles.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                if (user == null) {
+                    Toast.makeText(getActivity(),"Please login first",Toast.LENGTH_LONG).show();
+                    return;
+                }
                 selectfile();
             }
         });
@@ -81,6 +88,11 @@ public class SecondFragment extends Fragment {
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                if (user == null) {
+                    Toast.makeText(getActivity(),"Please login first",Toast.LENGTH_LONG).show();
+                    return;
+                }
 
                 String message = message_et.getText().toString();
                 String author = author_et.getText().toString();
